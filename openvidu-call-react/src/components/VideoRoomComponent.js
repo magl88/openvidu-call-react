@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import cn from 'classnames';
 import './VideoRoomComponent.css';
 import { OpenVidu } from 'openvidu-browser';
 import StreamComponent from './stream/StreamComponent';
@@ -46,6 +47,7 @@ class VideoRoomComponent extends Component {
         this.toggleChat = this.toggleChat.bind(this);
         this.checkNotification = this.checkNotification.bind(this);
         this.checkSize = this.checkSize.bind(this);
+        this.handleVideoClick = this.handleVideoClick.bind(this);
     }
 
     componentDidMount() {
@@ -67,6 +69,14 @@ class VideoRoomComponent extends Component {
         window.addEventListener('resize', this.updateLayout);
         window.addEventListener('resize', this.checkSize);
         this.joinSession();
+    }
+
+    componentDidUpdate(prevProps) {
+        const { selectedUser } = this.props;
+
+        if ((!prevProps.selectedUser && selectedUser) || (prevProps.selectedUser && !selectedUser)) {
+            this.updateLayout();
+        }
     }
 
     componentWillUnmount() {
@@ -438,7 +448,15 @@ class VideoRoomComponent extends Component {
         }
     }
 
+    handleVideoClick(e, user) {
+        const { onUserVideoClick } = this.props;
+        if (e.target.tagName === 'VIDEO') {
+            onUserVideoClick(user);
+        }
+    }
+
     render() {
+        const { layoutClassName, selectedClassName, selectedUser } = this.props;
         const mySessionId = this.state.mySessionId;
         const localUser = this.state.localUser;
         var chatDisplay = { display: this.state.chatDisplay };
@@ -460,17 +478,32 @@ class VideoRoomComponent extends Component {
 
                 <DialogExtensionComponent showDialog={this.state.showExtensionDialog} cancelClicked={this.closeDialogExtension} />
 
-                <div id="layout" className="bounds">
-                    {localUser !== undefined && localUser.getStreamManager() !== undefined && (
-                        <div className="OT_root OT_publisher custom-class" id="localUser">
+                {selectedUser && selectedUser.connectionId && (
+                  <div className={cn('OT_root OT_publisher custom-class', selectedClassName)} id="selectedUser">
+                      <StreamComponent
+                        user={selectedUser}
+                        handleNickname={selectedUser.type === 'local' ? this.nicknameChanged : undefined}
+                        streamId={selectedUser.type === 'remote' ? selectedUser.streamManager.stream.streamId : undefined}
+                      />
+                  </div>
+                )}
+                <div id="layout" className={cn('bounds', layoutClassName)}>
+                    {localUser !== undefined && localUser.getStreamManager() !== undefined && localUser.connectionId !== selectedUser.connectionId && (
+                        <div className="OT_root OT_publisher custom-class" id="localUser" onClick={e => this.handleVideoClick(e, localUser)}>
                             <StreamComponent user={localUser} handleNickname={this.nicknameChanged} />
                         </div>
                     )}
-                    {this.state.subscribers.map((sub, i) => (
-                        <div key={i} className="OT_root OT_publisher custom-class" id="remoteUsers">
-                            <StreamComponent user={sub} streamId={sub.streamManager.stream.streamId} />
-                        </div>
-                    ))}
+                    {this.state.subscribers.map((sub, i) => {
+                        if (sub.connectionId === selectedUser.connectionId) {
+                            return null;
+                        }
+
+                        return (
+                          <div key={i} className="OT_root OT_publisher custom-class" id="remoteUsers" onClick={e => this.handleVideoClick(e, sub)}>
+                              <StreamComponent user={sub} streamId={sub.streamManager.stream.streamId} />
+                          </div>
+                        );
+                    })}
                     {localUser !== undefined && localUser.getStreamManager() !== undefined && (
                         <div className="OT_root OT_publisher custom-class" style={chatDisplay}>
                             <ChatComponent
