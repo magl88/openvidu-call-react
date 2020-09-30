@@ -488,13 +488,13 @@ class VideoRoomComponent extends Component {
                   </div>
                 )}
                 <div id="layout" className={cn('bounds', layoutClassName)}>
-                    {localUser !== undefined && localUser.getStreamManager() !== undefined && localUser.connectionId !== selectedUser.connectionId && (
+                    {localUser !== undefined && localUser.getStreamManager() !== undefined && (!selectedUser || localUser.connectionId !== selectedUser.connectionId) && (
                         <div className="OT_root OT_publisher custom-class" id="localUser" onClick={e => this.handleVideoClick(e, localUser)}>
                             <StreamComponent user={localUser} handleNickname={this.nicknameChanged} />
                         </div>
                     )}
                     {this.state.subscribers.map((sub, i) => {
-                        if (sub.connectionId === selectedUser.connectionId) {
+                        if (selectedUser && sub.connectionId === selectedUser.connectionId) {
                             return null;
                         }
 
