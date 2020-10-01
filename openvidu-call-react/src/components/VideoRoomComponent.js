@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import cn from 'classnames';
+import { isEqual } from 'lodash'
 import './VideoRoomComponent.css';
 import { OpenVidu } from 'openvidu-browser';
 import StreamComponent from './stream/StreamComponent';
@@ -74,8 +75,21 @@ class VideoRoomComponent extends Component {
     componentDidUpdate(prevProps) {
         const { selectedUser } = this.props;
 
-        if ((!prevProps.selectedUser && selectedUser) || (prevProps.selectedUser && !selectedUser)) {
-            this.updateLayout();
+        if (!isEqual(prevProps.selectedUser, selectedUser)) {
+            const openviduLayoutOptions = {
+                maxRatio: 3 / 2,
+                minRatio: 9 / 16,
+                fixedRatio: false,
+                bigClass: 'OV_big',
+                bigPercentage: 0.8,
+                bigFixedRatio: false,
+                bigMaxRatio: 3 / 2,
+                bigMinRatio: 9 / 16,
+                bigFirst: true,
+                animate: false,
+            };
+            this.layout.setLayoutOptions(openviduLayoutOptions);
+            this.layout.updateLayout();
         }
     }
 
