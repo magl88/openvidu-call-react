@@ -23,10 +23,8 @@ class VideoRoomComponent extends Component {
         this.OPENVIDU_SERVER_SECRET = this.props.openviduSecret ? this.props.openviduSecret : 'MY_SECRET';
         this.hasBeenUpdated = false;
         this.layout = new OpenViduLayout();
-        let sessionName = this.props.sessionName ? this.props.sessionName : 'SessionA';
         let userName = this.props.user ? this.props.user : 'OpenVidu_User' + Math.floor(Math.random() * 100);
         this.state = {
-            mySessionId: sessionName,
             myUserName: userName,
             session: undefined,
             localUser: undefined,
@@ -201,7 +199,6 @@ class VideoRoomComponent extends Component {
         this.setState({
             session: undefined,
             subscribers: [],
-            mySessionId: 'SessionA',
             myUserName: 'OpenVidu_User' + Math.floor(Math.random() * 100),
             localUser: undefined,
         });
@@ -470,15 +467,14 @@ class VideoRoomComponent extends Component {
     }
 
     render() {
-        const { layoutClassName, selectedClassName, selectedUser } = this.props;
-        const mySessionId = this.state.mySessionId;
+        const { layoutClassName, selectedClassName, selectedUser, sessionName } = this.props;
         const localUser = this.state.localUser;
         var chatDisplay = { display: this.state.chatDisplay };
 
         return (
             <div className="container" id="container">
                 <ToolbarComponent
-                    sessionId={mySessionId}
+                    sessionId={sessionName}
                     user={localUser}
                     showNotification={this.state.messageReceived}
                     camStatusChanged={this.camStatusChanged}
