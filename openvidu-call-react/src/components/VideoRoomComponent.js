@@ -163,18 +163,18 @@ class VideoRoomComponent extends Component {
             frameRate: 30,
             insertMode: 'APPEND',
         });
-
-        if (this.state.session.capabilities.publish) {
-            this.state.session.publish(publisher).then(() => {
-                if (this.props.joinSession) {
-                    this.props.joinSession();
-                }
-            });
-        }
         localUser.setNickname(this.state.myUserName);
         localUser.setConnectionId(this.state.session.connection.connectionId);
         localUser.setScreenShareActive(false);
         localUser.setStreamManager(publisher);
+
+        if (this.state.session.capabilities.publish) {
+            this.state.session.publish(publisher).then(() => {
+                if (this.props.joinSession) {
+                    this.props.joinSession(localUser);
+                }
+            });
+        }
         this.subscribeToUserChanged();
         this.subscribeToStreamDestroyed();
         this.sendSignalUserChanged({ isScreenShareActive: localUser.isScreenShareActive() });
