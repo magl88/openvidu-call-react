@@ -67,6 +67,7 @@ export default class ToolbarComponent extends Component {
     render() {
         const mySessionId = this.props.sessionId;
         const localUser = this.props.user;
+        const actions = this.props.actions;
         return (
             <AppBar className="toolbar" id="header">
                 <Toolbar className="toolbar">
@@ -112,6 +113,7 @@ export default class ToolbarComponent extends Component {
                         <IconButton color="secondary" className="navButton" onClick={this.leaveSession} id="navLeaveButton">
                             <PowerSettingsNew />
                         </IconButton>
+                        {actions}
                          <IconButton color="inherit" onClick={this.toggleChat} id="navChatButton">
                             {this.props.showNotification && <div id="point" className="" />}
                             <Tooltip title="Chat">

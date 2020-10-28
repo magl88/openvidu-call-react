@@ -467,7 +467,7 @@ class VideoRoomComponent extends Component {
     }
 
     render() {
-        const { layoutClassName, selectedClassName, selectedUser, sessionName } = this.props;
+        const { layoutClassName, selectedClassName, selectedUser, sessionName, toolbarActions } = this.props;
         const localUser = this.state.localUser;
         var chatDisplay = { display: this.state.chatDisplay };
 
@@ -484,6 +484,7 @@ class VideoRoomComponent extends Component {
                     toggleFullscreen={this.toggleFullscreen}
                     leaveSession={this.leaveSession}
                     toggleChat={this.toggleChat}
+                    actions={toolbarActions}
                 />
 
                 <DialogExtensionComponent showDialog={this.state.showExtensionDialog} cancelClicked={this.closeDialogExtension} />
