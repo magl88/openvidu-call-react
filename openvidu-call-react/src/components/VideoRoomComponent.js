@@ -15,6 +15,10 @@ import ToolbarComponent from './toolbar/ToolbarComponent';
 var localUser = new UserModel();
 
 class VideoRoomComponent extends Component {
+    static defaultProps = {
+        onSubscribersUpdate: () => {},
+    };
+
     constructor(props) {
         super(props);
         this.OPENVIDU_SERVER_URL = this.props.openviduServerUrl
@@ -228,6 +232,7 @@ class VideoRoomComponent extends Component {
     }
 
     deleteSubscriber(stream) {
+        const { onSubscribersUpdate } = this.props;
         const remoteUsers = this.state.subscribers;
         const userStream = remoteUsers.filter((user) => user.getStreamManager().stream === stream)[0];
         let index = remoteUsers.indexOf(userStream, 0);
@@ -235,11 +240,13 @@ class VideoRoomComponent extends Component {
             remoteUsers.splice(index, 1);
             this.setState({
                 subscribers: remoteUsers,
-            });
+            }, () => onSubscribersUpdate(remoteUsers));
         }
     }
 
     subscribeToStreamCreated() {
+        const { onSubscribersUpdate } = this.props;
+
         this.state.session.on('streamCreated', (event) => {
             const subscriber = this.state.session.subscribe(event.stream, undefined);
             var subscribers = this.state.subscribers;
@@ -268,6 +275,7 @@ class VideoRoomComponent extends Component {
                         });
                     }
                     this.updateLayout();
+                    onSubscribersUpdate(subscribers);
                 },
             );
         });
@@ -287,6 +295,8 @@ class VideoRoomComponent extends Component {
     }
 
     subscribeToUserChanged() {
+        const { onSubscribersUpdate } = this.props;
+
         this.state.session.on('signal:userChanged', (event) => {
             let remoteUsers = this.state.subscribers;
             remoteUsers.forEach((user) => {
@@ -311,7 +321,10 @@ class VideoRoomComponent extends Component {
                 {
                     subscribers: remoteUsers,
                 },
-                () => this.checkSomeoneShareScreen(),
+                () => {
+                    this.checkSomeoneShareScreen();
+                    onSubscribersUpdate(remoteUsers);
+                },
             );
         });
     }
