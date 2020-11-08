@@ -75,9 +75,12 @@ class VideoRoomComponent extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        const { selectedUser } = this.props;
+        const { selectedUser, userListOpened } = this.props;
 
-        if (!isEqual(prevProps.selectedUser, selectedUser)) {
+        if (
+          !isEqual(prevProps.selectedUser, selectedUser) ||
+          !isEqual(prevProps.userListOpened, userListOpened)
+        ) {
             const openviduLayoutOptions = {
                 maxRatio: 3 / 2,
                 minRatio: 9 / 16,
@@ -480,7 +483,7 @@ class VideoRoomComponent extends Component {
     }
 
     render() {
-        const { layoutClassName, selectedClassName, selectedUser, sessionName, toolbarActions } = this.props;
+        const { layoutClassName, selectedClassName, selectedUser, sessionName, toolbarActions, maxVideos } = this.props;
         const localUser = this.state.localUser;
         var chatDisplay = { display: this.state.chatDisplay };
 
@@ -517,7 +520,7 @@ class VideoRoomComponent extends Component {
                             <StreamComponent user={localUser} handleNickname={this.nicknameChanged} />
                         </div>
                     )}
-                    {this.state.subscribers.map((sub, i) => {
+                    {this.state.subscribers.slice(0, maxVideos).map((sub, i) => {
                         if (selectedUser && sub.connectionId === selectedUser.connectionId) {
                             return null;
                         }
