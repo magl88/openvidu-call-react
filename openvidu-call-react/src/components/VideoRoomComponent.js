@@ -17,6 +17,7 @@ var localUser = new UserModel();
 class VideoRoomComponent extends Component {
     static defaultProps = {
         onSubscribersUpdate: () => {},
+        subVideoClassName: () => {},
     };
 
     constructor(props) {
@@ -483,7 +484,16 @@ class VideoRoomComponent extends Component {
     }
 
     render() {
-        const { layoutClassName, selectedClassName, selectedUser, sessionName, toolbarActions, maxVideos } = this.props;
+        const {
+            subVideoClassName,
+            layoutClassName,
+            selectedClassName,
+            selectedUser,
+            sessionName,
+            toolbarActions,
+            maxVideos,
+            disableNicknameEdit,
+        } = this.props;
         const localUser = this.state.localUser;
         var chatDisplay = { display: this.state.chatDisplay };
 
@@ -509,6 +519,7 @@ class VideoRoomComponent extends Component {
                   <div className={cn('OT_root OT_publisher custom-class', selectedClassName)} id="selectedUser">
                       <StreamComponent
                         user={selectedUser}
+                        disableNicknameEdit={disableNicknameEdit}
                         handleNickname={selectedUser.type === 'local' ? this.nicknameChanged : undefined}
                         streamId={selectedUser.type === 'remote' ? selectedUser.streamManager.stream.streamId : undefined}
                       />
@@ -517,7 +528,11 @@ class VideoRoomComponent extends Component {
                 <div id="layout" className={cn('bounds', layoutClassName)}>
                     {localUser !== undefined && localUser.getStreamManager() !== undefined && (!selectedUser || localUser.connectionId !== selectedUser.connectionId) && (
                         <div className="OT_root OT_publisher custom-class" id="localUser" onClick={e => this.handleVideoClick(e, localUser)}>
-                            <StreamComponent user={localUser} handleNickname={this.nicknameChanged} />
+                            <StreamComponent
+                              user={localUser}
+                              handleNickname={this.nicknameChanged}
+                              disableNicknameEdit={disableNicknameEdit}
+                            />
                         </div>
                     )}
                     {this.state.subscribers.slice(0, maxVideos).map((sub, i) => {
@@ -526,7 +541,12 @@ class VideoRoomComponent extends Component {
                         }
 
                         return (
-                          <div key={i} className="OT_root OT_publisher custom-class" id="remoteUsers" onClick={e => this.handleVideoClick(e, sub)}>
+                          <div
+                            key={i}
+                            className={cn('OT_root OT_publisher custom-class', subVideoClassName(sub))}
+                            id="remoteUsers"
+                            onClick={e => this.handleVideoClick(e, sub)}
+                          >
                               <StreamComponent user={sub} streamId={sub.streamManager.stream.streamId} />
                           </div>
                         );

@@ -52,6 +52,8 @@ export default class StreamComponent extends Component {
     }
 
     render() {
+        const { disableNicknameEdit } = this.props;
+
         return (
             <div className="OT_widget-container">
                 <div className="pointer nickname">
@@ -79,9 +81,9 @@ export default class StreamComponent extends Component {
                             )}
                         </FormControl>
                     ) : (
-                        <div onClick={this.toggleNicknameForm}>
+                        <div onClick={disableNicknameEdit ? undefined : this.toggleNicknameForm}>
                             <span id="nickname">{this.props.user.getNickname()}</span>
-                            {this.props.user.isLocal() && <span id=""> (edit)</span>}
+                            {!disableNicknameEdit && this.props.user.isLocal() && <span id=""> (edit)</span>}
                         </div>
                     )}
                 </div>
