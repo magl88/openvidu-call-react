@@ -18,6 +18,9 @@ class VideoRoomComponent extends Component {
     static defaultProps = {
         onSubscribersUpdate: () => {},
         subVideoClassName: () => {},
+        onLeaveClick: () => {},
+        defaultCamOff: false,
+        defaultMicOff: false,
     };
 
     constructor(props) {
@@ -29,6 +32,8 @@ class VideoRoomComponent extends Component {
         this.hasBeenUpdated = false;
         this.layout = new OpenViduLayout();
         let userName = this.props.user ? this.props.user : 'OpenVidu_User' + Math.floor(Math.random() * 100);
+        localUser.setAudioActive(!this.props.defaultMicOff)
+        localUser.setVideoActive(!this.props.defaultCamOff)
         this.state = {
             myUserName: userName,
             session: undefined,
@@ -493,6 +498,7 @@ class VideoRoomComponent extends Component {
             toolbarActions,
             maxVideos,
             disableNicknameEdit,
+            onLeaveClick,
         } = this.props;
         const localUser = this.state.localUser;
         var chatDisplay = { display: this.state.chatDisplay };
@@ -508,7 +514,10 @@ class VideoRoomComponent extends Component {
                     screenShare={this.screenShare}
                     stopScreenShare={this.stopScreenShare}
                     toggleFullscreen={this.toggleFullscreen}
-                    leaveSession={this.leaveSession}
+                    leaveSession={() => {
+                        this.leaveSession()
+                        onLeaveClick()
+                    }}
                     toggleChat={this.toggleChat}
                     actions={toolbarActions}
                 />
